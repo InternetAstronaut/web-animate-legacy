@@ -1,4 +1,5 @@
 # WebAnimate
+![image](https://github.com/user-attachments/assets/efb6a3e9-4150-49f5-a28d-fde06210849c)
 #### WebAnimate is based on Wick Editor!
 
  is a browser-based hybrid animation/coding environment for making interactive things for the web, heavily inspired by similar tools such as Flash, HyperCard, and Scratch. It was developed in response to a growing need for such a tool for the modern web. Wick is currently live at [www.WickEditor.com](http://wickeditor.com/), come check it out sometime!
