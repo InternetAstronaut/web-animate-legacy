@@ -20,7 +20,7 @@ If you're a creator that wants to support WebAnimate, one of the most helpful th
 
 ## How to help/hack this old fart of a website so we can make it good.
 * Clone or download and unzip this repo
-* Open terminal in the newly made `wick` folder and start an HTTP server:
+* Open terminal in the newly made `web-animate` folder and start an HTTP server:
   * `python -m SimpleHTTPServer` (Python 2)
   * `python -m http.server` (Python 3)
 * OR if you have npm installed, you can get [http-server](https://github.com/indexzero/http-server), which is faster
@@ -31,4 +31,4 @@ If you're a creator that wants to support WebAnimate, one of the most helpful th
   * `live-server` to start, once you change a file, the website reloads!
 * Open a browser window, and go to `http://localhost:8000/`
 
-Need help? Feel free to contact []() (that's me).
+Need help? Feel free to contact [`@noobfield` on the Wick Editor Forums!](https://forum.wickeditor.com/u/noobfield/summary) (that's me). *OR, make a help-wanted issue!*
