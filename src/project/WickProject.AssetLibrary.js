@@ -14,112 +14,114 @@
 
     You should have received a copy of the GNU General Public License
     along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
-    
-var AssetLibrary = function () {
 
-    this.assets = {};
+class AssetLibrary {
+    constructor() {
 
-};
+        this.assets = {};
 
-AssetLibrary.prototype.addAsset = function (asset) {
-
-    if(asset.uuid) {
-        this.assets[asset.uuid] = asset;
-    } else {
-        var uuid = random.uuid4();
-        this.assets[uuid] = asset;
-        asset.uuid = uuid;
-
-        return uuid;
     }
 
-    wickEditor.library.dirty = true;
+    addAsset(asset) {
 
-}
+        if(asset.uuid) {
+            this.assets[asset.uuid] = asset;
+        } else {
+            const uuid = random.uuid4();
+            this.assets[uuid] = asset;
+            asset.uuid = uuid;
 
-AssetLibrary.prototype.deleteAsset = function (uuid) {
-
-    this.assets[uuid] = null;
-    delete this.assets[uuid];
-    
-    wickEditor.library.dirty = true;
-
-}
-
-AssetLibrary.prototype.getAsset = function (uuid) {
-
-    return this.assets[uuid];
-
-}
-
-AssetLibrary.prototype.getAllAssets = function (type) {
-
-    var allAssets = [];
-
-    for (assetUUID in this.assets) {
-        var asset = this.assets[assetUUID];
-        if(!type || asset.type === type) {
-            allAssets.push(asset);
+            return uuid;
         }
+
+        wickEditor.library.dirty = true;
+
     }
 
-    return allAssets;
+    deleteAsset(uuid) {
 
-}
+        this.assets[uuid] = null;
+        delete this.assets[uuid];
+        
+        wickEditor.library.dirty = true;
 
-AssetLibrary.prototype.getAssetByName = function (filename) {
-
-    var foundAsset = null;
-    this.getAllAssets().forEach(function (asset) {
-        if (asset.filename === filename)
-            foundAsset = asset;
-    });
-    return foundAsset
-
-}
-
-/* For backwards compatibility... */
-AssetLibrary.prototype.regenAssetUUIDs = function () {
-
-    for (assetUUID in this.assets) {
-        var asset = this.assets[assetUUID];
-        asset.uuid = assetUUID;
     }
 
-}
+    getAsset(uuid) {
 
-AssetLibrary.prototype.printInfo = function () {
+        return this.assets[uuid];
 
-    var totalSize = 0;
-    for (assetUUID in this.assets) {
-        var asset = this.assets[assetUUID];
-        totalSize += asset.data.length;
-
-        console.log("Filename: "+asset.filename);
-        console.log("Type: "+asset.type);
-        console.log("Size: "+asset.data.length);
-        console.log("---")
     }
-    console.log("Total library size: " + totalSize)
 
+    getAllAssets(type) {
+
+        const allAssets = [];
+
+        for (assetUUID in this.assets) {
+            const asset = this.assets[assetUUID];
+            if(!type || asset.type === type) {
+                allAssets.push(asset);
+            }
+        }
+
+        return allAssets;
+
+    }
+
+    getAssetByName(filename) {
+
+        let foundAsset = null;
+        this.getAllAssets().forEach(asset => {
+            if (asset.filename === filename)
+                foundAsset = asset;
+        });
+        return foundAsset
+
+    }
+
+    /* For backwards compatibility... */
+    regenAssetUUIDs() {
+
+        for (assetUUID in this.assets) {
+            const asset = this.assets[assetUUID];
+            asset.uuid = assetUUID;
+        }
+
+    }
+
+    printInfo() {
+
+        let totalSize = 0;
+        for (assetUUID in this.assets) {
+            const asset = this.assets[assetUUID];
+            totalSize += asset.data.length;
+
+            console.log(`Filename: ${asset.filename}`);
+            console.log(`Type: ${asset.type}`);
+            console.log(`Size: ${asset.data.length}`);
+            console.log("---")
+        }
+        console.log(`Total library size: ${totalSize}`)
+
+    }
+
+    encodeStrings() {
+        this.getAllAssets().forEach(asset => {
+            asset.filename = WickProject.Compressor.encodeString(asset.filename);
+        });
+    }
+
+    decodeStrings() {
+        this.getAllAssets().forEach(asset => {
+            asset.filename = WickProject.Compressor.decodeString(asset.filename);
+        });
+    }
 }
 
-AssetLibrary.prototype.encodeStrings = function () {
-    this.getAllAssets().forEach(function (asset) {
-        asset.filename = WickProject.Compressor.encodeString(asset.filename);
-    });
-}
+AssetLibrary.addPrototypes = ({assets}) => {
 
-AssetLibrary.prototype.decodeStrings = function () {
-    this.getAllAssets().forEach(function (asset) {
-        asset.filename = WickProject.Compressor.decodeString(asset.filename);
-    });
-}
-
-AssetLibrary.addPrototypes = function (library) {
-
-    for (assetUUID in library.assets) {
-        library.assets[assetUUID].__proto__ = WickAsset.prototype;
+    for (assetUUID in assets) {
+        assets[assetUUID].__proto__ = WickAsset.prototype;
     }
 
 }

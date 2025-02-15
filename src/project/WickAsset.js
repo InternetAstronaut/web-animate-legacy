@@ -15,34 +15,36 @@
     You should have received a copy of the GNU General Public License
     along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
-var WickAsset = function (data, type, filename, compress) {
+class WickAsset {
+    constructor(data, type, filename, compress) {
 
-    this.data = data;
-    this.type = type;
-    this.filename = filename;
-    this.compressed = compress;
+        this.data = data;
+        this.type = type;
+        this.filename = filename;
+        this.compressed = compress;
 
-    if(compress) {
-        console.log("big file size: " + this.data.length);
-        this.data = LZString.compressToBase64(this.data);
-        console.log("compressed file size: " + this.data.length);
-        console.log("Look how much space we saved wow!");
+        if(compress) {
+            console.log(`big file size: ${this.data.length}`);
+            this.data = LZString.compressToBase64(this.data);
+            console.log(`compressed file size: ${this.data.length}`);
+            console.log("Look how much space we saved wow!");
+        }
+
     }
 
-}
-
-WickAsset.prototype.getData = function () {
-    if(this.compressed) {
-        return LZString.decompressFromBase64(this.data);
-    } else {
-        return this.data;
+    getData() {
+        if(this.compressed) {
+            return LZString.decompressFromBase64(this.data);
+        } else {
+            return this.data;
+        }
     }
-}
 
-WickAsset.prototype.getType = function () {
-    return this.type;
-}
+    getType() {
+        return this.type;
+    }
 
-WickAsset.prototype.getFilename = function () {
-    return this.filename;
+    getFilename() {
+        return this.filename;
+    }
 }

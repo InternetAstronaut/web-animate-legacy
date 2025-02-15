@@ -15,13 +15,13 @@
     You should have received a copy of the GNU General Public License
     along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
-WickProject.Compressor = (function () {
+WickProject.Compressor = (() => {
 
-    var projectCompressor = { };
+    const projectCompressor = { };
 
-    var printFilesize = false;
+    const printFilesize = false;
 
-    var compressionRoutines = {
+    const compressionRoutines = {
         'LZSTRING-BASE64': {
             compress:LZString.compressToBase64, 
             decompress:LZString.decompressFromBase64
@@ -30,28 +30,28 @@ WickProject.Compressor = (function () {
             compress:LZString.compressToUTF16, 
             decompress:LZString.decompressFromUTF16
         }
-    }
+    };
 
-    projectCompressor.compressProject = function (projectJSON, compressionRoutineName) {
-        if(printFilesize) console.log("Compressing project of size " + projectJSON.length);
+    projectCompressor.compressProject = (projectJSON, compressionRoutineName) => {
+        if(printFilesize) console.log(`Compressing project of size ${projectJSON.length}`);
 
-        var compressionRoutine = compressionRoutines[compressionRoutineName];
-        var compressedProjectJSON = compressionRoutineName+compressionRoutine.compress(projectJSON)
+        const compressionRoutine = compressionRoutines[compressionRoutineName];
+        const compressedProjectJSON = compressionRoutineName+compressionRoutine.compress(projectJSON);
 
-        if(printFilesize) console.log("Done! Result size " + compressedProjectJSON.length);
+        if(printFilesize) console.log(`Done! Result size ${compressedProjectJSON.length}`);
         return compressedProjectJSON;
     }
 
-    projectCompressor.decompressProject = function (compressedProjectJSON) {
+    projectCompressor.decompressProject = compressedProjectJSON => {
         if(printFilesize) console.log("Decompressing project...")
 
-        var projectJSON = compressedProjectJSON;
+        let projectJSON = compressedProjectJSON;
 
-        for (var compressionRoutineName in compressionRoutines) {
+        for (const compressionRoutineName in compressionRoutines) {
             if(compressedProjectJSON.startsWith(compressionRoutineName)) {
-                console.log("Project compressed with " + compressionRoutineName)
-                var compressionRoutine = compressionRoutines[compressionRoutineName];
-                var rawCompressedProjectJSON = compressedProjectJSON.substring(compressionRoutineName.length, compressedProjectJSON.length);
+                console.log(`Project compressed with ${compressionRoutineName}`)
+                const compressionRoutine = compressionRoutines[compressionRoutineName];
+                const rawCompressedProjectJSON = compressedProjectJSON.substring(compressionRoutineName.length, compressedProjectJSON.length);
                 projectJSON = compressionRoutine.decompress(rawCompressedProjectJSON);
             }
         }
@@ -60,15 +60,15 @@ WickProject.Compressor = (function () {
         return projectJSON;
     }
     
-    projectCompressor.encodeString = function (str) {
-        var newStr = str;
+    projectCompressor.encodeString = str => {
+        let newStr = str;
         newStr = encodeURI(str);
         newStr = newStr.replace(/'/g, "%27");
         return newStr;
     }
 
-    projectCompressor.decodeString = function (str) {
-        var newStr = str;
+    projectCompressor.decodeString = str => {
+        let newStr = str;
         newStr = newStr.replace(/%27/g, "'");
         newStr = decodeURI(str);
         return newStr;

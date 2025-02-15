@@ -15,80 +15,82 @@
     You should have received a copy of the GNU General Public License
     along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
-var tweenValueNames = ["x","y","scaleX","scaleY","rotation","opacity"];
+const tweenValueNames = ["x","y","scaleX","scaleY","rotation","opacity"];
 
-var WickTween = function() {
-    this.x = 0;
-    this.y = 0; 
-    this.z = 0; 
-    this.scaleX = 1;
-    this.scaleY = 1;
-    this.rotation = 0;
-    this.opacity = 1;
+class WickTween {
+    constructor() {
+        this.x = 0;
+        this.y = 0; 
+        this.z = 0; 
+        this.scaleX = 1;
+        this.scaleY = 1;
+        this.rotation = 0;
+        this.opacity = 1;
 
-    this.playheadPosition = 0;
-    this.rotations = 0;
+        this.playheadPosition = 0;
+        this.rotations = 0;
 
-    this.uuid = random.uuid4();
+        this.uuid = random.uuid4();
 
-    this.tweenType = 'Linear';
-    this.tweenDir = 'None';
+        this.tweenType = 'Linear';
+        this.tweenDir = 'None';
+    }
+
+    copy() {
+        const copy = new WickTween();
+
+        copy.x = this.x;
+        copy.y = this.y; 
+        copy.z = this.z; 
+        copy.scaleX = this.scaleX;
+        copy.scaleY = this.scaleY;
+        copy.rotation = this.rotation;
+        copy.opacity = this.opacity;
+
+        copy.playheadPosition = this.playheadPosition;
+        copy.rotations = this.rotations;
+
+        copy.tweenType = this.tweenType;
+        copy.tweenDir = this.tweenDir;
+
+        return copy;
+    }
+
+    updateFromWickObjectState(wickObject) {
+        const self = this;
+        
+        tweenValueNames.forEach(name => {
+            self[name] = wickObject[name];
+        });
+    }
+
+    applyTweenToWickObject(wickObject) {
+        const that = this;
+
+        tweenValueNames.forEach(name => {
+            wickObject[name] = that[name];
+        });
+    }
 }
 
-WickTween.fromWickObjectState = function (wickObject) {
-	var tween = new WickTween();
+WickTween.fromWickObjectState = wickObject => {
+	const tween = new WickTween();
 
-	tweenValueNames.forEach(function (name) {
+	tweenValueNames.forEach(name => {
 		tween[name] = wickObject[name];
 	});
 
 	return tween;
 }
 
-WickTween.prototype.copy = function () {
-    var copy = new WickTween();
+WickTween.interpolateTweens = (tweenA, tweenB, t) => {
+	const interpTween = new WickTween();
 
-    copy.x = this.x;
-    copy.y = this.y; 
-    copy.z = this.z; 
-    copy.scaleX = this.scaleX;
-    copy.scaleY = this.scaleY;
-    copy.rotation = this.rotation;
-    copy.opacity = this.opacity;
-
-    copy.playheadPosition = this.playheadPosition;
-    copy.rotations = this.rotations;
-
-    copy.tweenType = this.tweenType;
-    copy.tweenDir = this.tweenDir;
-
-    return copy;
-}
-
-WickTween.prototype.updateFromWickObjectState = function (wickObject) {
-    var self = this;
-    
-    tweenValueNames.forEach(function (name) {
-        self[name] = wickObject[name];
-    });
-}
-
-WickTween.prototype.applyTweenToWickObject = function(wickObject) {
-	var that = this;
-
-	tweenValueNames.forEach(function (name) {
-		wickObject[name] = that[name];
-	});
-};
-
-WickTween.interpolateTweens = function (tweenA, tweenB, t) {
-	var interpTween = new WickTween();
-
-	var tweenFunc = (tweenA.tweenType === "Linear") ? (TWEEN.Easing.Linear.None) : (TWEEN.Easing[tweenA.tweenType][tweenA.tweenDir]);
-	tweenValueNames.forEach(function (name) {
-		var tt = tweenFunc(t);
-        var valA = tweenA[name];
-        var valB = tweenB[name];
+	const tweenFunc = (tweenA.tweenType === "Linear") ? (TWEEN.Easing.Linear.None) : (TWEEN.Easing[tweenA.tweenType][tweenA.tweenDir]);
+	tweenValueNames.forEach(name => {
+		const tt = tweenFunc(t);
+        let valA = tweenA[name];
+        let valB = tweenB[name];
         if(name === 'rotation') {
             while(valA < -180) valA += 360;
             while(valB < -180) valB += 360;

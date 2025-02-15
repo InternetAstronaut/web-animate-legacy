@@ -15,22 +15,22 @@
     You should have received a copy of the GNU General Public License
     along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
     
-WickProject.Exporter = (function () {
+WickProject.Exporter = (() => {
 
-    var projectExporter = { };
+    const projectExporter = { };
 
-    projectExporter.generatePlayer = function () {
+    projectExporter.generatePlayer = () => {
 
         if(window.cachedPlayer) return window.cachedPlayer;
         
-        var fileOut = "";
+        let fileOut = "";
 
         // Add the player webpage (need to download the empty player)
-        var emptyPlayerPath = "src/player/emptyplayer.htm";
-        fileOut += FileDownloader.downloadFile(emptyPlayerPath) + "\n";
+        const emptyPlayerPath = "src/player/emptyplayer.htm";
+        fileOut += `${FileDownloader.downloadFile(emptyPlayerPath)}\n`;
 
         // All libs needed by the player. 
-        var requiredLibFiles = [
+        const requiredLibFiles = [
             "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.6/pixi.min.js",
             "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js",
             //"https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js",
@@ -65,16 +65,16 @@ WickProject.Exporter = (function () {
             "src/player/WickPlayer.js",
         ];
 
-        var totalSize = 0;
-        requiredLibFiles.forEach(function (filename) {
-            var script = FileDownloader.downloadFile(filename);
+        let totalSize = 0;
+        requiredLibFiles.forEach(filename => {
+            const script = FileDownloader.downloadFile(filename);
             //console.log(script.length + " used for " + filename);
 
             //var scriptCompressed = LZString.compressToBase64(script)
             //console.log(scriptCompressed.length + " compressed: " + filename);
 
             totalSize += script.length;
-            fileOut += "<script>" + script + "</script>\n";
+            fileOut += `<script>${script}</script>\n`;
         });
         //console.log(totalSize + " total");
 
@@ -83,74 +83,74 @@ WickProject.Exporter = (function () {
 
     }
 
-    projectExporter.exportPlayer = function () {
-        var emptyplayerString = projectExporter.generatePlayer();
-        var blob = new Blob([emptyplayerString], {type: "text/plain;charset=utf-8"});
+    projectExporter.exportPlayer = () => {
+        const emptyplayerString = projectExporter.generatePlayer();
+        const blob = new Blob([emptyplayerString], {type: "text/plain;charset=utf-8"});
         saveAs(blob, "player.html")
     }
 
-    projectExporter.bundleProjectToHTML = function (wickProject, callback) {
+    projectExporter.bundleProjectToHTML = (wickProject, callback) => {
 
-        var fileOut = projectExporter.generatePlayer();
+        let fileOut = projectExporter.generatePlayer();
 
         // Bundle the JSON project
-        wickProject.getAsJSON(function (JSONProject) {
+        wickProject.getAsJSON(JSONProject => {
 
-            wickProject.library.getAllAssets('script').forEach(function (asset) {
-                fileOut += '<script>' + asset.getData() + '</script>';
+            wickProject.library.getAllAssets('script').forEach(asset => {
+                fileOut += `<script>${asset.getData()}</script>`;
             });
 
-            fileOut += "<script>var wickPlayer = new WickPlayer(); wickPlayer.runProject('" + JSONProject + "', document.getElementById('playerCanvasContainer'));</script>" + "\n";
+            fileOut += `<script>var wickPlayer = new WickPlayer(); wickPlayer.runProject('${JSONProject}', document.getElementById('playerCanvasContainer'));</script>\n`;
             callback(fileOut);
         });
 
     }
 
-    projectExporter.exportProject = function (wickProject, args) {
+    projectExporter.exportProject = (wickProject, args) => {
 
         if(args && args.wick) {
-            wickProject.getAsJSON(function(JSONProject) {
-                var byteArray = LZString.compressToUint8Array(JSONProject);
+            wickProject.getAsJSON(JSONProject => {
+                const byteArray = LZString.compressToUint8Array(JSONProject);
                 
-                var blob1 = new Blob([byteArray], {type: "application/octet-stream"});
+                const blob1 = new Blob([byteArray], {type: "application/octet-stream"});
 
-                saveAs(blob1, wickProject.name+'-'+timeStamp()+".wick");
+                saveAs(blob1, `${wickProject.name}-${timeStamp()}.wick`);
             });
             return;
         }
 
         if(args && args.json) {
-            wickProject.getAsJSON(function(JSONProject) {
-                var blob = new Blob([JSONProject], {type: "text/plain;charset=utf-8"});
-                saveAs(blob, wickProject.name+'-'+timeStamp()+'.json');
+            wickProject.getAsJSON(JSONProject => {
+                const blob = new Blob([JSONProject], {type: "text/plain;charset=utf-8"});
+                saveAs(blob, `${wickProject.name}-${timeStamp()}.json`);
             }, '\t');
             return;
         }
 
-        projectExporter.bundleProjectToHTML(wickProject, function(fileOut) {
-            var filename = wickProject.name || "project";
+        projectExporter.bundleProjectToHTML(wickProject, fileOut => {
+            const filename = wickProject.name || "project";
             if(args && args.zipped) {
-                var zip = new JSZip();
+                const zip = new JSZip();
                 zip.file("index.html", fileOut);
-                zip.generateAsync({type:"blob"}).then(function(content) {
-                    saveAs(content, filename+'-'+timeStamp()+".zip");
+                zip.generateAsync({type:"blob"}).then(content => {
+                    saveAs(content, `${filename}-${timeStamp()}.zip`);
                 });
             } else {
                 if(args && args.asNewWindow) {
-                    var x=window.open('','','width='+wickProject.width+', height='+wickProject.height);
+                    const x=window.open('','',`width=${wickProject.width}, height=${wickProject.height}`);
                     x.document.open().write(fileOut);
                 } else {
-                    var blob = new Blob([fileOut], {type: "text/plain;charset=utf-8"});
-                    saveAs(blob, filename+'-'+timeStamp()+".html");
+                    const blob = new Blob([fileOut], {type: "text/plain;charset=utf-8"});
+                    saveAs(blob, `${filename}-${timeStamp()}.html`);
                 }
             }
         });
 
     }
 
-    projectExporter.autosaveProject = function (wickProject, args) {
-        wickProject.getAsJSON(function (projectJSON) {
-            console.log("Project size: " + projectJSON.length)
+    projectExporter.autosaveProject = (wickProject, args) => {
+        wickProject.getAsJSON(projectJSON => {
+            console.log(`Project size: ${projectJSON.length}`)
             idbKeyval.set('AutosavedWickProject', projectJSON)
               .then(() => {
                 wickEditor.alertbox.showProjectSavedMessage();
@@ -161,13 +161,13 @@ WickProject.Exporter = (function () {
         });
     }
 
-    projectExporter.getAutosavedProject = function (callback) {
+    projectExporter.getAutosavedProject = callback => {
         idbKeyval.get('AutosavedWickProject').then(val => {
             if(!val) {
                 callback(new WickProject());
             } else {
                 if(localStorage.alwaysLoadAutosavedProject === 'true' || window.confirm("There is an autosaved project. Would you like to recover it?")) {
-                    var project = WickProject.fromJSON(val);
+                    const project = WickProject.fromJSON(val);
                     callback(project);
                     return;
                 } else {
@@ -178,7 +178,7 @@ WickProject.Exporter = (function () {
         });
     }
 
-    var dontJSONVars = [
+    const dontJSONVars = [
         "thumbnail",
         "clones",
         "currentObject",
@@ -208,16 +208,16 @@ WickProject.Exporter = (function () {
         "tweenClipboardData",
     ];
 
-    projectExporter.JSONReplacer = function(key, value) {
-        if (dontJSONVars.indexOf(key) !== -1) {
+    projectExporter.JSONReplacer = (key, value) => {
+        if (dontJSONVars.includes(key)) {
             return undefined;
         } else {
             return value;
         }
     }
 
-    projectExporter.JSONReplacerObject = function (key, value) {
-        if (key === "uuid" || dontJSONVars.indexOf(key) !== -1) {
+    projectExporter.JSONReplacerObject = (key, value) => {
+        if (key === "uuid" || dontJSONVars.includes(key)) {
             return undefined;
         } else {
             return value;

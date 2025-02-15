@@ -15,37 +15,37 @@
     You should have received a copy of the GNU General Public License
     along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
-var WickCamera = function (project) {
+const WickCamera = function({width, height}) {
 
-    var self = this;
+    const self = this;
 
-    var x = project.width/2;
-    var y = project.height/2;
+    let x = width/2;
+    let y = height/2;
 
-    var followingObject = null;
-    var followingSmoothness = 1;
+    let followingObject = null;
+    let followingSmoothness = 1;
 
-    this.followObject = function (object, smoothness) {
+    this.followObject = (object, smoothness) => {
     	followingObject = object;
     	followingSmoothness = smoothness || 1;
     }
 
-    this.getPosition = function () {
+    this.getPosition = () => {
     	return {
-    		x: x, 
-    		y: y
+    		x, 
+    		y
     	};
     }
 
-    this.setPosition = function (_x,_y) {
+    this.setPosition = (_x, _y) => {
     	x = _x;
     	y = _y;
     }
 
-    this.update = function () {
+    this.update = () => {
     	if(followingObject) {
-    		var dx = followingObject.x - x;
-    		var dy = followingObject.y - y;
+    		const dx = followingObject.x - x;
+    		const dy = followingObject.y - y;
     		self.setPosition(
     			x + dx*followingSmoothness, 
     			y + dy*followingSmoothness
